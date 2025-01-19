@@ -27,7 +27,8 @@ public class PlayerController {
     }
 
     @PostMapping
-    public PlayerEntity addPlayer(@Valid @RequestBody PlayerEntity player) {
+    public PlayerEntity addPlayer(@RequestBody(required = false) PlayerEntity player) {
+        System.out.println("Přijatý hráč: " + player);
         playerService.savePlayer(player);
         return player;
     }

@@ -41,7 +41,7 @@ class PlayerControllerTest {
     void testGetPlayerByEmail() {
         // Mockovaná data
         PlayerEntity mockPlayer = new PlayerEntity();
-        mockPlayer.setId(1L);
+        mockPlayer.setId(1);
         mockPlayer.setEmail("test@email.cz");
         mockPlayer.setJmeno("Testovací jméno");
         mockPlayer.setRole(PlayerEntity.Role.USER);

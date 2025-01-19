@@ -1,6 +1,8 @@
 package com.example.tipovacka.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -20,22 +22,27 @@ public class PlayerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Include
-    private Long id;
+    private Integer id;
 
     @NotNull
     @Size(min = 3, max = 50)
     @ToString.Include
+    @JsonProperty("jmeno") // Odpovídá klíči "jmeno" v JSONu
     private String jmeno;
 
     @NotNull
-    @UniqueElements
+    @Email
+    @Column(unique = true)
+    @JsonProperty("email") // Odpovídá klíči "email" v JSONu
     private String email;
 
     @NotNull
+    @JsonProperty("heslo") // Odpovídá klíči "heslo" v JSONu
     private String heslo;
 
     @Enumerated(EnumType.STRING)
     @NotNull
+    @JsonProperty("role") // Odpovídá klíči "role" v JSONu
     private Role role;
 
     @Override
