@@ -9,21 +9,31 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository pro tipovacka_db.hraci
+ * Repository pro tabulku `hraci` v databázi `tipovacka_db`
  */
 @Repository
 public interface PlayerDAO extends JpaRepository<PlayerEntity, Long> {
 
-    /* Vrací seznam všech hráčů
+    /**
+     * Vrací seznam všech hráčů
      * @return List<PlayerEntity> seznam všech hráčů
      */
     @Query(value = "SELECT * FROM hraci", nativeQuery = true)
     List<PlayerEntity> findAll();
 
-    /* Vrací hráče s danou e-mailovou adresou
-     * @param id
+    /**
+     * Vrací hráče podle ID
+     * @param id ID hráče
      * @return Optional<PlayerEntity>
      */
     @Query(value = "SELECT * FROM hraci WHERE id = ?1", nativeQuery = true)
     Optional<PlayerEntity> findById(Long id);
+
+    /**
+     * Vrací hráče podle e-mailu
+     * @param email E-mail hráče
+     * @return Optional<PlayerEntity>
+     */
+    @Query(value = "SELECT * FROM hraci WHERE email = ?1", nativeQuery = true)
+    Optional<PlayerEntity> findByEmail(String email);
 }
