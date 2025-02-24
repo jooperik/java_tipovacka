@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Povolit Postman konfigurační soubory
+!postman/*.json
