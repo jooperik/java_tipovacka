@@ -1,0 +1,300 @@
+{
+	"info": {
+		"_postman_id": "cb601a73-843f-4360-aad0-7b4d8520314e",
+		"name": "Hráči",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "501106"
+	},
+	"item": [
+		{
+			"name": "Přihlásit se jako admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code je 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response obsahuje token\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    pm.expect(responseJson).to.have.property('token');",
+							"    pm.expect(responseJson.token).to.be.a('string');",
+							"    pm.expect(responseJson.token.length).to.be.greaterThan(0);",
+							"    ",
+							"    if (responseJson.token) {",
+							"        pm.environment.set(\"token\", responseJson.token);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"admin@example.com\",\n    \"heslo\": \"admin123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9000/api/players/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"players",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Zobraz všechny hráče",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code je 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response je pole hráčů\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.be.an('array');",
+							"    ",
+							"    if (responseJson.length > 0) {",
+							"        pm.expect(responseJson[0]).to.have.property('id');",
+							"        pm.expect(responseJson[0]).to.have.property('jmeno');",
+							"        pm.expect(responseJson[0]).to.have.property('email');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/players",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"players"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vytvoření nového hráče",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code je 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response obsahuje správná data hráče\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    const requestBody = JSON.parse(pm.request.body.raw);",
+							"    ",
+							"    pm.expect(responseJson).to.have.property('id');",
+							"    pm.expect(responseJson.jmeno).to.eql(requestBody.jmeno);",
+							"    pm.expect(responseJson.email).to.eql(requestBody.email);",
+							"    pm.expect(responseJson.role).to.eql(requestBody.role);",
+							"",
+							"    pm.environment.set(\"player_id\", responseJson.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"jmeno\": \"Jan Novák\",\n    \"email\": \"jan.novak@example.com\",\n    \"heslo\": \"heslo123\",\n    \"role\": \"USER\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/players",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"players"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Najdi hráče dle ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code je 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response obsahuje správná data hráče\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    pm.expect(responseJson).to.have.property('id');",
+							"    pm.expect(responseJson.id.toString()).to.eql(pm.environment.get(\"admin_id\").toString());",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/players/{{admin_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"players",
+						"{{admin_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Smaž testovacího hráče",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code je 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/players/{{player_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"players",
+						"{{player_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
