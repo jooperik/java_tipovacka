@@ -34,3 +34,11 @@ build/
 
 # Povolit Postman konfigurační soubory
 !postman/*.json
+
+### Logs ###
+logs/
+*.log
+*.log.*
+*.log.*.*
+*.log.*.*.*
+*.log.*.*.*.*
