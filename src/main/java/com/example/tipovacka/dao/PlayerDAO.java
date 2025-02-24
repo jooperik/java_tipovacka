@@ -26,4 +26,7 @@ public interface PlayerDAO extends JpaRepository<PlayerEntity, Long> {
      */
     @Query(value = "SELECT * FROM hraci WHERE id = ?1", nativeQuery = true)
     Optional<PlayerEntity> findById(Long id);
+
+    @Query(value = "SELECT * FROM hraci WHERE email = ?1", nativeQuery = true)
+    Optional<PlayerEntity> findByEmail(String email);
 }
