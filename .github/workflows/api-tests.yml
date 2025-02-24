@@ -31,7 +31,11 @@ jobs:
     - name: Build and Run Spring Boot
       run: |
         mvn spring-boot:run &
-        sleep 30
+        sleep 30 # Počkáme na nastartování aplikace
+        
+        # Vytvoření admin účtu
+        curl -X POST http://localhost:9000/api/players/create-admin
+        sleep 5 # Počkáme na vytvoření admina
         
     - name: Install Newman
       run: npm install -g newman
