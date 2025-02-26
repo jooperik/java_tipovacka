@@ -42,3 +42,6 @@ logs/
 *.log.*.*
 *.log.*.*.*
 *.log.*.*.*.*
+
+### Mac ###
+.DS_Store

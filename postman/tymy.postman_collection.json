@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "cb601a73-843f-4360-aad0-7b4d8520314e",
-		"name": "Hráči",
+		"_postman_id": "fe93579d-3661-45a4-91ec-d92d152a8923",
+		"name": "Týmy",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "501106"
 	},
@@ -19,14 +19,9 @@
 							"",
 							"pm.test(\"Response obsahuje token\", function () {",
 							"    const responseJson = pm.response.json();",
-							"    ",
 							"    pm.expect(responseJson).to.have.property('token');",
 							"    pm.expect(responseJson.token).to.be.a('string');",
-							"    pm.expect(responseJson.token.length).to.be.greaterThan(0);",
-							"    ",
-							"    if (responseJson.token) {",
-							"        pm.environment.set(\"token\", responseJson.token);",
-							"    }",
+							"    pm.environment.set(\"token\", responseJson.token);",
 							"});"
 						],
 						"type": "text/javascript",
@@ -35,14 +30,11 @@
 				}
 			],
 			"request": {
-				"auth": {
-					"type": "noauth"
-				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"admin@example.com\",\n    \"heslo\": \"admin123\"\n}",
+					"raw": "{\n    \"email\": \"{{admin_email}}\",\n    \"heslo\": \"{{admin_pass}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -50,12 +42,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:9000/api/players/login",
-					"protocol": "http",
+					"raw": "{{base_url}}/api/players/login",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "9000",
 					"path": [
 						"api",
 						"players",
@@ -66,7 +56,7 @@
 			"response": []
 		},
 		{
-			"name": "Zobraz všechny hráče",
+			"name": "Zobraz všechny týmy",
 			"event": [
 				{
 					"listen": "test",
@@ -76,19 +66,18 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"Response je pole hráčů\", function () {",
+							"pm.test(\"Response je pole týmů\", function () {",
 							"    const responseJson = pm.response.json();",
 							"    pm.expect(responseJson).to.be.an('array');",
 							"    ",
 							"    if (responseJson.length > 0) {",
 							"        pm.expect(responseJson[0]).to.have.property('id');",
-							"        pm.expect(responseJson[0]).to.have.property('jmeno');",
-							"        pm.expect(responseJson[0]).to.have.property('email');",
+							"        pm.expect(responseJson[0]).to.have.property('nazev');",
+							"        pm.expect(responseJson[0]).to.have.property('logo');",
 							"    }",
 							"});"
 						],
-						"type": "text/javascript",
-						"packages": {}
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -106,20 +95,20 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/players",
+					"raw": "{{base_url}}/api/teams",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"players"
+						"teams"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Vytvoření nového hráče",
+			"name": "Vytvořit tým",
 			"event": [
 				{
 					"listen": "test",
@@ -129,17 +118,13 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"Response obsahuje správná data hráče\", function () {",
-							"    const responseJson = pm.response.json();",
-							"    const requestBody = JSON.parse(pm.request.body.raw);",
-							"    ",
-							"    pm.expect(responseJson).to.have.property('id');",
-							"    pm.expect(responseJson.jmeno).to.eql(requestBody.jmeno);",
-							"    pm.expect(responseJson.email).to.eql(requestBody.email);",
-							"    pm.expect(responseJson.role).to.eql(requestBody.role);",
-							"",
-							"    pm.environment.set(\"player_id\", responseJson.id);",
-							"});"
+							"pm.test(\"Response obsahuje správná data týmu\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.exist;",
+							"    pm.expect(jsonData.nazev).to.equal(pm.environment.get(\"test_team_name\"));",
+							"    pm.environment.set(\"test_team_id\", jsonData.id);",
+							"});",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -161,7 +146,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"jmeno\": \"Jan Novák\",\n    \"email\": \"jan.novak@example.com\",\n    \"heslo\": \"heslo123\",\n    \"role\": \"USER\"\n}",
+					"raw": "{\n    \"nazev\": \"{{test_team_name}}\",\n    \"logo\": \"logos/test.png\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -169,20 +154,20 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/api/players",
+					"raw": "{{base_url}}/api/teams",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"players"
+						"teams"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Najdi hráče dle ID",
+			"name": "Najít tým podle ID",
 			"event": [
 				{
 					"listen": "test",
@@ -192,11 +177,10 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"Response obsahuje správná data hráče\", function () {",
-							"    const responseJson = pm.response.json();",
-							"    ",
-							"    pm.expect(responseJson).to.have.property('id');",
-							"    pm.expect(responseJson.id.toString()).to.eql(pm.environment.get(\"admin_id\").toString());",
+							"pm.test(\"Response obsahuje správná data týmu\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(parseInt(jsonData.id)).to.equal(parseInt(pm.environment.get(\"test_team_id\")));",
+							"    pm.expect(jsonData.nazev).to.equal(pm.environment.get(\"test_team_name\"));",
 							"});"
 						],
 						"type": "text/javascript",
@@ -218,21 +202,79 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/players/{{admin_id}}",
+					"raw": "{{base_url}}/api/teams/{{test_team_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"players",
-						"{{admin_id}}"
+						"teams",
+						"{{test_team_id}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Smaž testovacího hráče",
+			"name": "Upravit tým",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code je 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response obsahuje aktualizovaná data\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.nazev).to.equal(pm.environment.get(\"test_team_name_updated\"));",
+							"    pm.expect(jsonData.logo).to.equal(\"logos/test_new.png\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nazev\": \"{{test_team_name_updated}}\",\n    \"logo\": \"logos/test_new.png\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/teams/{{test_team_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"teams",
+						"{{test_team_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Smazat tým",
 			"event": [
 				{
 					"listen": "test",
@@ -261,40 +303,18 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/players/{{player_id}}",
+					"raw": "{{base_url}}/api/teams/{{test_team_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"players",
-						"{{player_id}}"
+						"teams",
+						"{{test_team_id}}"
 					]
 				}
 			},
 			"response": []
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
 		}
 	]
 }

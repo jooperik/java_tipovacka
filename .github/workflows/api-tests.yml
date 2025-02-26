@@ -42,7 +42,8 @@ jobs:
       
     - name: Run Postman Tests
       run: |
-        newman run ./postman/tipovacka.postman_collection.json -e ./postman/local.postman_environment.json
+        newman run ./postman/hraci.postman_collection.json -e ./postman/local.postman_environment.json
+        newman run ./postman/tymy.postman_collection.json -e ./postman/local.postman_environment.json
         if [ $? -ne 0 ]; then
           echo "Postman tests failed"
           exit 1
