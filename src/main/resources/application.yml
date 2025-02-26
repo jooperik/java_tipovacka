@@ -12,3 +12,17 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
+logging:
+  level:
+    com.example.tipovacka: DEBUG
+    org.springframework.web: DEBUG
+    org.springdoc: DEBUG
+  file:
+    name: logs/tipovacka.log
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
