@@ -3,6 +3,7 @@ package com.example.tipovacka.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.lang.NonNull;
 
 public class JwtInterceptor implements HandlerInterceptor {
     
@@ -13,7 +14,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     }
     
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         String authHeader = request.getHeader("Authorization");
         
         if (request.getMethod().equals("OPTIONS")) {

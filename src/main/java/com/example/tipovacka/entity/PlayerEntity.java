@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.UniqueElements;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
