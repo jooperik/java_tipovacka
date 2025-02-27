@@ -19,12 +19,12 @@ public class TeamEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Schema(description = "Název týmu", example = "HC Sparta Praha", required = true)
+    @Schema(description = "Název týmu", example = "SK Slavia Praha", required = true)
     @NotNull
     @Size(min = 3, max = 100)
     @Column(unique = true)
     private String nazev;
 
-    @Schema(description = "Cesta k logu týmu", example = "logos/sparta.png")
+    @Schema(description = "Cesta k logu týmu", example = "logos/slavia.png")
     private String logo;
 }
