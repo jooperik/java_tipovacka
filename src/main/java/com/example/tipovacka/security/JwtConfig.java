@@ -23,13 +23,14 @@ public class JwtConfig {
         return signingKey;
     }
     
-    public String generateToken(String email, Long userId) {
+    public String generateToken(String email, Long userId, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
         
         return Jwts.builder()
                 .setSubject(email)
                 .claim("userId", userId)
+                .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
@@ -42,5 +43,14 @@ public class JwtConfig {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+    
+    public String getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
     }
 } 

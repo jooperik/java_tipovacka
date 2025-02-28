@@ -32,14 +32,11 @@ public class PlayerService {
     }
 
     public String authenticate(String email, String heslo) {
-        PlayerEntity player = playerDAO.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Neplatné přihlašovací údaje"));
-        
-        if (!passwordEncoder.matches(heslo, player.getHeslo())) {
-            throw new RuntimeException("Neplatné přihlašovací údaje");
+        PlayerEntity player = findByEmail(email);
+        if (player != null && passwordEncoder.matches(heslo, player.getHeslo())) {
+            return jwtConfig.generateToken(email, player.getId().longValue(), player.getRole().name());
         }
-
-        return jwtConfig.generateToken(email, player.getId().longValue());
+        throw new RuntimeException("Neplatné přihlašovací údaje");
     }
 
     public void savePlayer(PlayerEntity player) {
@@ -55,5 +52,10 @@ public class PlayerService {
             throw new RuntimeException(String.format("Hráč s id %d neexistuje", id));
         }
         playerDAO.deleteById(id);
+    }
+
+    private PlayerEntity findByEmail(String email) {
+        return playerDAO.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Neplatné přihlašovací údaje"));
     }
 }

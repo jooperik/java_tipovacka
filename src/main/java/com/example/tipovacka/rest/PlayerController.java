@@ -3,6 +3,7 @@ package com.example.tipovacka.rest;
 import com.example.tipovacka.entity.PlayerEntity;
 import com.example.tipovacka.service.PlayerService;
 import com.example.tipovacka.dto.LoginDTO;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,31 +24,21 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    @Operation(summary = "Seznam všech hráčů")
-    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<PlayerEntity> getAllPlayers() {
         return playerService.findAllPlayers();
     }
 
-    @Operation(summary = "Najít hráče podle ID",
-            description = "Vrátí detaily hráče podle zadaného ID")
-    @ApiResponse(responseCode = "200", description = "Hráč nalezen")
-    @ApiResponse(responseCode = "404", description = "Hráč nenalezen")
-    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     @GetMapping("/{id}")
     public PlayerEntity getPlayerById(@PathVariable Long id) {
         return playerService.findPlayerById(id);
     }
 
-    @Operation(summary = "Vytvořit nového hráče",
-            description = "Vytvoří nového hráče v systému")
-    @ApiResponse(responseCode = "200", description = "Hráč úspěšně vytvořen")
-    @ApiResponse(responseCode = "400", description = "Neplatná data hráče")
-    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public PlayerEntity addPlayer(@RequestBody(required = false) PlayerEntity player) {
-        System.out.println("Přijatý hráč: " + player);
+    public PlayerEntity addPlayer(@RequestBody PlayerEntity player) {
         playerService.savePlayer(player);
         return player;
     }

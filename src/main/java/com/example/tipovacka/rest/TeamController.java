@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,17 +22,19 @@ public class TeamController {
     }
 
     @Operation(summary = "Seznam všech týmů")
-    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @ApiResponse(responseCode = "200", description = "Seznam týmů")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @GetMapping
     public List<TeamEntity> getAllTeams() {
         return teamService.findAllTeams();
     }
 
-    @Operation(summary = "Najít tým podle ID",
-            description = "Vrátí detaily týmu podle zadaného ID")
+    @Operation(summary = "Najít tým podle ID")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @ApiResponse(responseCode = "200", description = "Tým nalezen")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @ApiResponse(responseCode = "404", description = "Tým nenalezen")
-    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
     public TeamEntity getTeamById(@PathVariable Long id) {
         return teamService.findTeamById(id);
@@ -41,7 +44,7 @@ public class TeamController {
             description = "Vytvoří nový tým v systému")
     @ApiResponse(responseCode = "200", description = "Tým úspěšně vytvořen")
     @ApiResponse(responseCode = "400", description = "Neplatná data týmu")
-    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public TeamEntity addTeam(@RequestBody TeamEntity team) {
         return teamService.saveTeam(team);
@@ -51,7 +54,7 @@ public class TeamController {
             description = "Smaže tým podle zadaného ID")
     @ApiResponse(responseCode = "200", description = "Tým úspěšně smazán")
     @ApiResponse(responseCode = "404", description = "Tým nenalezen")
-    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteTeam(@PathVariable Long id) {
         teamService.deleteTeam(id);
