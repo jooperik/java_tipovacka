@@ -25,19 +25,36 @@ public class PlayerController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Seznam všech hráčů",
+            description = "Vrátí seznam všech hráčů")
+    @ApiResponse(responseCode = "200", description = "Seznam všech hráčů")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @GetMapping
+    @SecurityRequirement(name = "bearerAuth")
     public List<PlayerEntity> getAllPlayers() {
         return playerService.findAllPlayers();
     }
 
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @Operation(summary = "Najít hráče podle ID",
+            description = "Vrátí detaily hráče podle zadaného ID")
+    @ApiResponse(responseCode = "200", description = "Hráč nalezen")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
+    @ApiResponse(responseCode = "404", description = "Hráč nenalezen")
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public PlayerEntity getPlayerById(@PathVariable Long id) {
         return playerService.findPlayerById(id);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Vytvořit nového hráče",
+            description = "Vytvoří nového hráče v systému")
+    @ApiResponse(responseCode = "200", description = "Hráč úspěšně vytvořen")
+    @ApiResponse(responseCode = "400", description = "Neplatná data hráče")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
     public PlayerEntity addPlayer(@RequestBody PlayerEntity player) {
         playerService.savePlayer(player);
         return player;
@@ -68,12 +85,14 @@ public class PlayerController {
         return admin;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Smazat hráče",
             description = "Smaže hráče podle zadaného ID")
     @ApiResponse(responseCode = "200", description = "Hráč úspěšně smazán")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @ApiResponse(responseCode = "404", description = "Hráč nenalezen")
-    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public void deletePlayer(@PathVariable Long id) {
         playerService.deletePlayer(id);
     }
