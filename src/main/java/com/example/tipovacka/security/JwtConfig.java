@@ -28,8 +28,8 @@ public class JwtConfig {
         Date expiryDate = new Date(now.getTime() + expiration);
         
         return Jwts.builder()
-                .setSubject(email)
-                .claim("userId", userId)
+                .setSubject(userId.toString())
+                .claim("email", email)
                 .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)

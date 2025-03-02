@@ -9,9 +9,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.example.tipovacka.security.JwtConfig;
 import com.example.tipovacka.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 
 @Configuration
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     
     private final JwtConfig jwtConfig;
@@ -27,6 +31,18 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(new JwtAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(ex -> ex
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    System.out.println("Access Denied Error: " + accessDeniedException.getMessage());
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Nemáte dostatečná oprávnění pro tento endpoint");
+                })
+                .authenticationEntryPoint((request, response, authException) -> {
+                    System.out.println("Authentication Error: " + authException.getMessage());
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Neplatný nebo chybějící token");
+                })
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/players/login",
@@ -37,7 +53,19 @@ public class SecurityConfig {
                     "/v3/api-docs.yaml"
                 ).permitAll()
                 .anyRequest().authenticated()
-            );
+            )
+            .authenticationProvider(new AuthenticationProvider() {
+                @Override
+                public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+                    System.out.println("Authenticating user with roles: " + authentication.getAuthorities());
+                    return authentication;
+                }
+
+                @Override
+                public boolean supports(Class<?> authentication) {
+                    return true;
+                }
+            });
         return http.build();
     }
 } 
