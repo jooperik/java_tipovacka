@@ -17,6 +17,7 @@ logging:
     com.example.tipovacka: DEBUG
     org.springframework.web: DEBUG
     org.springdoc: DEBUG
+    org.springframework.security: DEBUG
   file:
     name: logs/tipovacka.log
 springdoc:

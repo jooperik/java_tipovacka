@@ -3,11 +3,16 @@ package com.example.tipovacka.rest;
 import com.example.tipovacka.entity.PlayerEntity;
 import com.example.tipovacka.service.PlayerService;
 import com.example.tipovacka.dto.LoginDTO;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,31 +28,59 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    @Operation(summary = "Seznam všech hráčů")
-    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Seznam všech hráčů",
+            description = "Vrátí seznam všech hráčů")
+    @ApiResponse(responseCode = "200", description = "Seznam všech hráčů")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @GetMapping
+    @SecurityRequirement(name = "bearerAuth")
     public List<PlayerEntity> getAllPlayers() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            throw new AccessDeniedException("Nemáte oprávnění zobrazit seznam všech hráčů");
+        }
         return playerService.findAllPlayers();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.principal")
     @Operation(summary = "Najít hráče podle ID",
             description = "Vrátí detaily hráče podle zadaného ID")
     @ApiResponse(responseCode = "200", description = "Hráč nalezen")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @ApiResponse(responseCode = "404", description = "Hráč nenalezen")
-    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public PlayerEntity getPlayerById(@PathVariable Long id) {
-        return playerService.findPlayerById(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String principal = auth.getPrincipal().toString();
+        String authorities = auth.getAuthorities().toString();
+        
+        System.out.println("Accessing player ID: " + id);
+        System.out.println("Current user ID: " + principal);
+        System.out.println("Current user authorities: " + authorities);
+        
+        if (!auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")) 
+            && !id.toString().equals(principal)) {
+            throw new AccessDeniedException("Nemáte oprávnění zobrazit tohoto hráče");
+        }
+        
+        PlayerEntity player = playerService.findPlayerById(id);
+        if (player == null) {
+            throw new EntityNotFoundException("Hráč s ID " + id + " nebyl nalezen");
+        }
+        return player;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Vytvořit nového hráče",
             description = "Vytvoří nového hráče v systému")
     @ApiResponse(responseCode = "200", description = "Hráč úspěšně vytvořen")
     @ApiResponse(responseCode = "400", description = "Neplatná data hráče")
-    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @PostMapping
-    public PlayerEntity addPlayer(@RequestBody(required = false) PlayerEntity player) {
-        System.out.println("Přijatý hráč: " + player);
+    @SecurityRequirement(name = "bearerAuth")
+    public PlayerEntity addPlayer(@RequestBody PlayerEntity player) {
         playerService.savePlayer(player);
         return player;
     }
@@ -77,12 +110,14 @@ public class PlayerController {
         return admin;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Smazat hráče",
             description = "Smaže hráče podle zadaného ID")
     @ApiResponse(responseCode = "200", description = "Hráč úspěšně smazán")
+    @ApiResponse(responseCode = "403", description = "Přístup odepřen")
     @ApiResponse(responseCode = "404", description = "Hráč nenalezen")
-    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public void deletePlayer(@PathVariable Long id) {
         playerService.deletePlayer(id);
     }
