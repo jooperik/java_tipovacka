@@ -1,8 +1,13 @@
 server:
   port: 9000
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/tipovacka_db
+    url: jdbc:mysql://localhost:3306/tipovacka_db?useUnicode=true&characterEncoding=utf8
     username: root
     password: SimpleAndTrivial
   jpa:
@@ -24,6 +29,8 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+    encoding: UTF-8
   api-docs:
     enabled: true
     path: /v3/api-docs
+    charset: UTF-8
