@@ -35,11 +35,13 @@ public class SecurityConfig {
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                     System.out.println("Access Denied Error: " + accessDeniedException.getMessage());
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("text/plain;charset=UTF-8");
                     response.getWriter().write("Nemáte dostatečná oprávnění pro tento endpoint");
                 })
                 .authenticationEntryPoint((request, response, authException) -> {
                     System.out.println("Authentication Error: " + authException.getMessage());
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("text/plain;charset=UTF-8");
                     response.getWriter().write("Neplatný nebo chybějící token");
                 })
             )

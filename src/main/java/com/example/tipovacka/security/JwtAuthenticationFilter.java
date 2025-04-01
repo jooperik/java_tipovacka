@@ -53,6 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Long requestedId = Long.parseLong(requestURI.substring(requestURI.lastIndexOf('/') + 1));
                     if (!roleWithPrefix.equals("ROLE_ADMIN") && !userId.equals(requestedId.toString())) {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("text/plain;charset=UTF-8");
                         response.getWriter().write("Nemáte oprávnění zobrazit tohoto hráče");
                         return;
                     }
@@ -61,6 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (requestURI.equals("/api/players")) {  // Kontrola pro /api/players
                     if (!roleWithPrefix.equals("ROLE_ADMIN")) {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("text/plain;charset=UTF-8");
                         response.getWriter().write("Nemáte oprávnění zobrazit seznam všech hráčů");
                         return;
                     }
@@ -80,6 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("Error in JWT filter: " + e.getMessage());
                 SecurityContextHolder.clearContext();
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("Neplatný token nebo nedostatečná oprávnění");
                 return;
             }
